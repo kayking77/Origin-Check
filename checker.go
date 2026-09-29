@@ -281,7 +281,8 @@ func pickQueries(text string, bib, max int) []string {
 		if bib >= 0 && s.Start >= bib {
 			break
 		}
-		st := Tokenize(text[s.Start:s.End])
+		seg := text[s.Start:s.End]
+		st := Tokenize(seg)
 		if len(st) < 8 {
 			continue
 		}
@@ -297,7 +298,7 @@ func pickQueries(text string, bib, max int) []string {
 		var words []string
 		var rare float64
 		for _, t := range st[a:b] {
-			w := text[t.Start:t.End]
+			w := seg[t.Start:t.End] // token offsets are relative to the sentence
 			words = append(words, w)
 			z := zipf(t.Norm)
 			if !stopwords[t.Norm] {
@@ -383,7 +384,7 @@ func (c *Checker) searchSources(ctx context.Context, sub *Submission, text strin
 		if ws, err := wikipediaSearch(ctx, kw, 4); err == nil {
 			found = append(found, ws...)
 		} else {
-			notes = append(notes, "Wikipedia could not be searched: "+err.Error())
+			notes = append(notes, explainErr("Wikipedia", err))
 		}
 		for i, q := range queries {
 			if i >= 3 {
@@ -395,23 +396,60 @@ func (c *Checker) searchSources(ctx context.Context, sub *Submission, text strin
 		}
 	}
 	if sub.Options.Publications {
-		progress("Searching published papers (OpenAlex)")
+		progress("Searching published papers and research databases")
 		pq := []string{kw}
 		for i, q := range queries {
 			if i%4 == 0 && len(pq) < 6 {
 				pq = append(pq, q)
 			}
 		}
-		okAny := false
-		for _, q := range pq {
-			if ps, err := openAlexSearch(ctx, q, 8); err == nil {
-				okAny = true
-				found = append(found, ps...)
-			}
+		type db struct {
+			name string
+			fn   func(context.Context, string) ([]fetchedSource, error)
 		}
-		if !okAny {
-			notes = append(notes, "The OpenAlex publications database could not be reached.")
+		dbs := []db{
+			{"OpenAlex", func(c context.Context, q string) ([]fetchedSource, error) {
+				return openAlexSearch(c, q, 8, set.OpenAlexKey)
+			}},
+			{"Semantic Scholar", func(c context.Context, q string) ([]fetchedSource, error) {
+				return semanticScholarSearch(c, q, 8, set.SemanticScholarKey)
+			}},
+			{"Crossref", func(c context.Context, q string) ([]fetchedSource, error) { return crossrefSearch(c, q, 8) }},
+			{"Europe PMC", func(c context.Context, q string) ([]fetchedSource, error) { return europePMCSearch(c, q, 6) }},
+			{"arXiv", func(c context.Context, q string) ([]fetchedSource, error) { return arxivSearch(c, q, 5) }},
 		}
+		if set.CoreKey != "" {
+			dbs = append(dbs, db{"CORE", func(c context.Context, q string) ([]fetchedSource, error) { return coreSearch(c, q, 5, set.CoreKey) }})
+		}
+		var wg sync.WaitGroup
+		for _, d := range dbs {
+			wg.Add(1)
+			go func(d db) {
+				defer wg.Done()
+				var lastErr error
+				ok := false
+				for _, q := range pq {
+					ps, err := d.fn(ctx, q)
+					if err != nil {
+						lastErr = err
+						if strings.Contains(err.Error(), "HTTP 4") {
+							break // refused: asking again won't help
+						}
+						continue
+					}
+					ok = true
+					mu.Lock()
+					found = append(found, ps...)
+					mu.Unlock()
+				}
+				if !ok && lastErr != nil {
+					mu.Lock()
+					notes = append(notes, explainErr(d.name, lastErr))
+					mu.Unlock()
+				}
+			}(d)
+		}
+		wg.Wait()
 	}
 
 	// General web search.
@@ -479,7 +517,7 @@ func (c *Checker) searchSources(ctx context.Context, sub *Submission, text strin
 		if failed == len(queries) {
 			msg := "Web search did not work for this check"
 			if lastErr != nil {
-				msg += " (" + lastErr.Error() + ")"
+				msg += " (" + shortErr(lastErr) + ")"
 			}
 			notes = append(notes, msg+". Only the repository, Wikipedia and publications were compared. Adding a free Brave Search key in Settings makes web search reliable.")
 		} else if failed > len(queries)/3 {

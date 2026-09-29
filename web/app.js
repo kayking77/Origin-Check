@@ -91,7 +91,7 @@ function editAssignment(a) {
     <div class="spacer"></div>
     <label>Compare papers against</label>
     <label class="check"><input type="checkbox" id="ow" ${a.options.web ? "checked" : ""}><span>Internet<small>Web search, Wikipedia and the pages they lead to</small></span></label>
-    <label class="check"><input type="checkbox" id="op" ${a.options.publications ? "checked" : ""}><span>Periodicals, journals and publications<small>Open scholarly databases (OpenAlex)</small></span></label>
+    <label class="check"><input type="checkbox" id="op" ${a.options.publications ? "checked" : ""}><span>Periodicals, journals and publications<small>Open research databases: OpenAlex, Semantic Scholar, Crossref, Europe PMC, arXiv, and CORE with a free key</small></span></label>
     <label class="check"><input type="checkbox" id="or" ${a.options.repository ? "checked" : ""}><span>Student paper repository<small>Every paper you've stored, from this and other assignments</small></span></label>
     <label class="check"><input type="checkbox" id="os" ${a.options.store ? "checked" : ""}><span>Store new papers in the repository<small>So later papers, from any student, are checked against them</small></span></label>
     <div class="spacer"></div>
@@ -509,7 +509,7 @@ async function settingsPage() {
   app.innerHTML = `<div class="page"><h1>Settings</h1><p class="sub">Your data is stored on this computer in <code>${esc(info.dataDir)}</code>. ${info.repository} paper${info.repository === 1 ? " is" : "s are"} in your repository.</p>
     <div class="card"><h2>General</h2><label>School or institution name (shown on PDF reports)</label><input type="text" id="inst" value="${esc(s.institutionName)}"></div>
     <div class="card"><h2>Web search</h2>
-      <p class="small">OriginCheck searches the web without any key, using DuckDuckGo and Bing, plus Wikipedia and OpenAlex. Keyless search can be slowed down or blocked if you check many papers at once. For dependable results, add a free search API key. <b>Brave Search</b> is the easiest: sign up at <a href="https://brave.com/search/api/" target="_blank" rel="noopener">brave.com/search/api</a> and choose the free plan.</p>
+      <p class="small">OriginCheck searches the web without any key, using DuckDuckGo and Bing, plus Wikipedia. Keyless search can be slowed down or blocked if you check many papers at once. For dependable results, add a free search API key. <b>Brave Search</b> is the easiest: sign up at <a href="https://brave.com/search/api/" target="_blank" rel="noopener">brave.com/search/api</a> and choose the free plan.</p>
       <div class="grid2">
         <div><label>Brave Search API key</label><input type="password" id="brave" value="${esc(s.braveKey)}" autocomplete="off"></div>
         <div><label>Bing Web Search API key (optional)</label><input type="password" id="bing" value="${esc(s.bingKey)}" autocomplete="off"></div>
@@ -521,8 +521,17 @@ async function settingsPage() {
       <div class="row" style="margin-top:14px"><button id="test">Test web search</button><div class="grow"></div></div>
       <div id="testres"></div>
     </div>
+    <div class="card"><h2>Research databases</h2>
+      <p class="small">Published papers are searched in OpenAlex, Semantic Scholar, Crossref, Europe PMC and arXiv, which work without keys but limit how much each computer can search. Free keys raise those limits, and a CORE key adds the full text of millions of open-access papers and theses, which finds far more copying than abstracts alone.</p>
+      <div class="grid2">
+        <div><label>OpenAlex API key (free: <a href="https://openalex.org/settings/api" target="_blank" rel="noopener">openalex.org/settings/api</a>)</label><input type="password" id="oakey" value="${esc(s.openAlexKey)}" autocomplete="off"></div>
+        <div><label>CORE API key (free: <a href="https://core.ac.uk/services/api" target="_blank" rel="noopener">core.ac.uk/services/api</a>)</label><input type="password" id="corekey" value="${esc(s.coreKey)}" autocomplete="off"></div>
+        <div><label>Semantic Scholar API key (optional: <a href="https://www.semanticscholar.org/product/api" target="_blank" rel="noopener">request one</a>)</label><input type="password" id="s2key" value="${esc(s.semanticScholarKey)}" autocomplete="off"></div>
+      </div>
+      <p class="small muted">Use <b>Test web search</b> above to check every search engine and database at once.</p>
+    </div>
     <div class="row"><div class="grow"></div><button class="primary" id="save">Save settings</button></div></div>`;
-  const read = () => ({ institutionName: $("#inst").value, braveKey: $("#brave").value.trim(), bingKey: $("#bing").value.trim(), googleKey: $("#gkey").value.trim(), googleCx: $("#gcx").value.trim(), maxQueries: +$("#mq").value, maxPages: +$("#mp").value });
+  const read = () => ({ institutionName: $("#inst").value, braveKey: $("#brave").value.trim(), bingKey: $("#bing").value.trim(), googleKey: $("#gkey").value.trim(), googleCx: $("#gcx").value.trim(), maxQueries: +$("#mq").value, maxPages: +$("#mp").value, openAlexKey: $("#oakey").value.trim(), coreKey: $("#corekey").value.trim(), semanticScholarKey: $("#s2key").value.trim() });
   $("#save").onclick = async () => { await post("/settings", read()); toast("Settings saved"); };
   $("#test").onclick = async () => {
     $("#testres").innerHTML = `<p><span class="spin"></span> Testing…</p>`;
@@ -540,11 +549,11 @@ async function aboutPage() {
   app.innerHTML = `<div class="page" style="max-width:900px">
     <h1>How OriginCheck works</h1><p class="sub">OriginCheck is modelled on Turnitin's Similarity Report and AI Writing Report.</p>
     <div class="card"><h2>Similarity report</h2>
-      <p>Each paper is broken into sentences. Distinctive sentences are searched on the web, and Wikipedia and the OpenAlex database of published papers are searched by topic. The pages found are downloaded and compared word by word with the paper, together with every paper stored in your repository. Passages of 7 or more words that match, allowing for small edits such as a changed or missing word, are highlighted.</p>
+      <p>Each paper is broken into sentences. Distinctive sentences are searched on the web, and Wikipedia and open research databases (OpenAlex, Semantic Scholar, Crossref, Europe PMC, arXiv, and CORE with a free key) are searched by topic. The pages found are downloaded and compared word by word with the paper, together with every paper stored in your repository. Passages of 7 or more words that match, allowing for small edits such as a changed or missing word, are highlighted.</p>
       <p><b>Overall similarity</b> is the share of the paper's words that match any source. Each matching word is credited to one source only, the one with the most matches, so the source percentages add up to the overall score, as in Turnitin's Match Overview. The breakdown by source type counts each type separately, so those can add up to more.</p>
       <p><b>Match groups</b> sort every match by whether it is in quotation marks and whether an in-text citation such as (Smith, 2020) or [3] is in the same sentence: Not Cited or Quoted, Missing Quotations, Missing Citation, and Cited and Quoted.</p>
       <p><b>Filters</b> can exclude quoted text, the bibliography, cited text, short matches, whole sources or single matches. <b>Integrity flags</b> warn about letters swapped for look-alikes from other alphabets and about hidden (white or tiny) text in Word files.</p>
-      <p><b>What it can't do:</b> Turnitin also compares with its private database of over a billion student papers and with subscription journals. Those aren't available to anyone else, so OriginCheck can only find copying from the open web, open scholarly abstracts, and papers you have checked yourself. The more of your classes' papers you store, the more useful the repository becomes.</p>
+      <p><b>What it can't do:</b> Turnitin also compares with its private database of over a billion student papers and with subscription journals. Those aren't available to anyone else, so OriginCheck can only find copying from the open web, open research papers (mostly their abstracts, or full text with a CORE key), and papers you have checked yourself. The more of your classes' papers you store, the more useful the repository becomes.</p>
     </div>
     <div class="card"><h2>AI writing report</h2>
       <p>The detector is a statistical model trained on thousands of essays, news articles and stories written by people and by AI models (ChatGPT, Claude and others), including essays by English learners. It looks at word choice, how predictable the vocabulary is, sentence rhythm, punctuation and phrasing habits. Passages of about 150 words are scored in overlapping windows, and each sentence gets the average score of the windows it sits in.</p>

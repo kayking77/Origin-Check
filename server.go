@@ -481,6 +481,17 @@ func (s *Server) testSearch(w http.ResponseWriter, r *http.Request) {
 	try("DuckDuckGo (no key)", func() (int, error) { h, err := ddgSearch(ctx, q); return len(h), err })
 	try("Bing (no key)", func() (int, error) { h, err := bingSearch(ctx, q); return len(h), err })
 	try("Wikipedia", func() (int, error) { h, err := wikipediaSearch(ctx, "mitochondria", 1); return len(h), err })
-	try("OpenAlex publications", func() (int, error) { h, err := openAlexSearch(ctx, "mitochondria energy", 3); return len(h), err })
+	pq := "mitochondria energy metabolism"
+	try("OpenAlex", func() (int, error) { h, err := openAlexSearch(ctx, pq, 3, set.OpenAlexKey); return len(h), err })
+	try("Semantic Scholar", func() (int, error) {
+		h, err := semanticScholarSearch(ctx, pq, 3, set.SemanticScholarKey)
+		return len(h), err
+	})
+	try("Crossref", func() (int, error) { h, err := crossrefSearch(ctx, pq, 10); return len(h), err })
+	try("Europe PMC", func() (int, error) { h, err := europePMCSearch(ctx, pq, 3); return len(h), err })
+	try("arXiv", func() (int, error) { h, err := arxivSearch(ctx, pq, 3); return len(h), err })
+	if set.CoreKey != "" {
+		try("CORE", func() (int, error) { h, err := coreSearch(ctx, pq, 3, set.CoreKey); return len(h), err })
+	}
 	writeJSONResp(w, out)
 }

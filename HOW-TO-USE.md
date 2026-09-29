@@ -8,7 +8,7 @@ OriginCheck checks student papers for copied text and AI-written text, and produ
 - **Compare papers:** checks every pair of papers in an assignment against each other, to spot students sharing work.
 - **PDF report** for each paper, to print or save.
 
-It runs on your own Windows computer. Papers stay on your computer; only short search phrases are sent to search engines.
+It runs on your own Windows computer. Papers stay on your computer; only short search phrases are sent to search engines and research databases.
 
 ## Start it
 
@@ -31,6 +31,20 @@ Without a key, OriginCheck searches DuckDuckGo and Bing directly. That works, bu
 
 1. Go to https://brave.com/search/api/ and sign up for the **free** plan (it allows a few thousand searches a month; each paper uses up to 40).
 2. In OriginCheck, open **Settings**, paste the key into **Brave Search API key**, click **Test web search**, then **Save settings**.
+
+## Research databases
+
+Published papers are searched in OpenAlex, Semantic Scholar, Crossref, Europe PMC and arXiv. They work without keys, but each limits how much one computer can search, so a report may note that a database refused or limited the search. Free keys fix that, and are added in **Settings → Research databases**:
+
+- **OpenAlex** (free, 30 seconds): https://openalex.org/settings/api
+- **CORE** (free): https://core.ac.uk/services/api. CORE has the full text of millions of open-access papers and theses, so it finds much more copying than the other databases, which mostly have abstracts only.
+- **Semantic Scholar** (optional): https://www.semanticscholar.org/product/api
+
+Click **Test web search** in Settings to see which search engines and databases are working.
+
+## Share it with others
+
+Send people the download link: https://github.com/kayking77/Origin-Check/releases/latest. Each person runs their own copy on their own Windows computer, with their own settings, keys and repository of papers. Nothing is shared between copies.
 
 ## Use it from your iPad or iPhone
 
@@ -58,4 +72,4 @@ The AI samples come from ChatGPT (2023) and Anthropic's Claude models; it hasn't
 
 ## What it can't match
 
-Turnitin also compares against its private database of more than a billion student papers and against subscription journals. Nobody else can access those, so OriginCheck finds copying from the open web, open scholarly abstracts (OpenAlex), Wikipedia, and the papers you've checked yourself. Keep **Store new papers in the repository** on, and it gets better as you check more classes.
+Turnitin also compares against its private database of more than a billion student papers and against subscription journals. Nobody else can access those, so OriginCheck finds copying from the open web, Wikipedia, open research papers (mostly abstracts, or full text with a free CORE key), and the papers you've checked yourself. Keep **Store new papers in the repository** on, and it gets better as you check more classes.

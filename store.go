@@ -15,13 +15,16 @@ import (
 )
 
 type Settings struct {
-	BraveKey        string `json:"braveKey"`
-	GoogleKey       string `json:"googleKey"`
-	GoogleCX        string `json:"googleCx"`
-	BingKey         string `json:"bingKey"`
-	MaxQueries      int    `json:"maxQueries"`
-	MaxPages        int    `json:"maxPages"`
-	InstitutionName string `json:"institutionName"`
+	BraveKey           string `json:"braveKey"`
+	GoogleKey          string `json:"googleKey"`
+	GoogleCX           string `json:"googleCx"`
+	BingKey            string `json:"bingKey"`
+	OpenAlexKey        string `json:"openAlexKey"`
+	SemanticScholarKey string `json:"semanticScholarKey"`
+	CoreKey            string `json:"coreKey"`
+	MaxQueries         int    `json:"maxQueries"`
+	MaxPages           int    `json:"maxPages"`
+	InstitutionName    string `json:"institutionName"`
 }
 
 func defaultSettings() Settings {

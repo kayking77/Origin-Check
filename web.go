@@ -412,8 +412,11 @@ func wikipediaSearch(ctx context.Context, q string, n int) ([]fetchedSource, err
 	return out, nil
 }
 
-func openAlexSearch(ctx context.Context, q string, n int) ([]fetchedSource, error) {
+func openAlexSearch(ctx context.Context, q string, n int, key string) ([]fetchedSource, error) {
 	u := fmt.Sprintf("https://api.openalex.org/works?per-page=%d&search=%s&select=id,doi,display_name,abstract_inverted_index,publication_year,primary_location,authorships", n, url.QueryEscape(q))
+	if key != "" {
+		u += "&api_key=" + url.QueryEscape(key)
+	}
 	b, _, err := httpGet(ctx, u, 4<<20)
 	if err != nil {
 		return nil, err
