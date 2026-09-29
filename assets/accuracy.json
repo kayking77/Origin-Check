@@ -1,0 +1,78 @@
+{
+ "metric": "Scored 20% or more",
+ "summary": "Share of papers that got an AI score of 20% or higher (the level at which a number is shown). For human-written papers that share is the false-alarm rate; for AI-written papers it is the detection rate. None of these papers were used to train the detector.",
+ "groups": [
+  {
+   "name": "University student essays (BAWE corpus, UK)",
+   "kind": "Human",
+   "docs": 697,
+   "rate": 0.0
+  },
+  {
+   "name": "Essays by English learners (ETS and PELIC corpora)",
+   "kind": "Human",
+   "docs": 314,
+   "rate": 0.0
+  },
+  {
+   "name": "Essays from an online essay site",
+   "kind": "Human",
+   "docs": 151,
+   "rate": 2.0
+  },
+  {
+   "name": "Short stories (Reddit WritingPrompts)",
+   "kind": "Human",
+   "docs": 111,
+   "rate": 2.7
+  },
+  {
+   "name": "News articles (Reuters)",
+   "kind": "Human",
+   "docs": 110,
+   "rate": 0.0
+  },
+  {
+   "name": "Essays by ChatGPT (GPT-3.5, several prompt styles)",
+   "kind": "AI",
+   "docs": 853,
+   "rate": 98.9
+  },
+  {
+   "name": "Essays by current Claude models (Haiku, Sonnet, Opus)",
+   "kind": "AI",
+   "docs": 115,
+   "rate": 92.2
+  },
+  {
+   "name": "Essays by the most capable current model (Opus)",
+   "kind": "AI",
+   "docs": 33,
+   "rate": 78.8
+  },
+  {
+   "name": "AI essays run through a \u201chumanizer\u201d tool",
+   "kind": "AI",
+   "docs": 90,
+   "rate": 98.9
+  },
+  {
+   "name": "Essays by Claude 1 (2023)",
+   "kind": "AI",
+   "docs": 192,
+   "rate": 89.1
+  },
+  {
+   "name": "Short stories by a current Claude model",
+   "kind": "AI",
+   "docs": 15,
+   "rate": 20.0
+  },
+  {
+   "name": "Student essays rewritten or polished by AI",
+   "kind": "AI-edited",
+   "docs": 14,
+   "rate": 14.3
+  }
+ ]
+}

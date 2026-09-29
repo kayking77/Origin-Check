@@ -1,0 +1,4 @@
+origincheck
+origincheck.exe
+*.tmp
+dist/
