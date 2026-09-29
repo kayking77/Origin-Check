@@ -12,7 +12,7 @@ It runs on your own Windows computer. Papers stay on your computer; only short s
 
 ## Start it
 
-1. Download `OriginCheck.zip`, right-click it and choose **Extract All**.
+1. Download `OriginCheck.zip` from the [Releases page](https://github.com/kayking77/Origin-Check/releases/latest), right-click it and choose **Extract All**.
 2. Double-click `origincheck.exe`.
    If Windows SmartScreen warns you, choose **More info → Run anyway** (the app isn't code-signed).
 3. A black window opens and your browser opens OriginCheck at `http://127.0.0.1:8430`.
